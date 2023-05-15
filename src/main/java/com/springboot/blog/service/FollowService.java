@@ -10,7 +10,7 @@ import java.util.List;
 public interface FollowService {
     String followUser(Long followingId, Long followerId);
 
-    List<User> showFollowing(Long userId);
+    List<String> showFollowing(Long userId);
 
-    List<User> showFollower(Long userId);
+    List<String> showFollower(Long userId);
 }

@@ -26,12 +26,12 @@ public class FollowController {
     }
 
     @GetMapping("/following/{id}")
-    public ResponseEntity<List<User>> showFollowing(@PathVariable(name = "id") long userId){
+    public ResponseEntity<List<String>> showFollowing(@PathVariable(name = "id") long userId){
         return ResponseEntity.ok(followService.showFollowing(userId));
     }
 
     @GetMapping("/follower/{id}")
-    public ResponseEntity<List<User>> showFollower(@PathVariable(name = "id") long userId){
+    public ResponseEntity<List<String>> showFollower(@PathVariable(name = "id") long userId){
         return ResponseEntity.ok(followService.showFollower(userId));
     }
 }

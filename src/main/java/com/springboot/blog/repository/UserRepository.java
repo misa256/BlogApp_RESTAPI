@@ -20,10 +20,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByEmail(String email);
 
-    @Query("SELECT f.following FROM Follow f WHERE f.follower.id = :userId")
+    @Query("SELECT u.followings FROM User u where u.id = :userId")
     List<User> getFollowings(Long userId);
 
-    @Query("SELECT f.follower FROM Follow f WHERE f.following.id = :userId")
+    @Query("SELECT u.followers FROM User u where u.id = :userId")
     List<User> getFollowers(Long userId);
 
 }
