@@ -8,9 +8,11 @@ import java.util.List;
 
 
 public interface FollowService {
-    String followUser(Long followingId, Long followerId);
+    String follow(Long followingId, Long followerId);
 
     List<String> showFollowing(Long userId);
 
     List<String> showFollower(Long userId);
+
+    String unfollow(Long followingId, Long followerId);
 }

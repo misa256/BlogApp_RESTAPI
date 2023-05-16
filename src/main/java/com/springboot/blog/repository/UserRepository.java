@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -20,10 +21,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByEmail(String email);
 
-    @Query("SELECT u.followings FROM User u where u.id = :userId")
-    List<User> getFollowings(Long userId);
-
-    @Query("SELECT u.followers FROM User u where u.id = :userId")
-    List<User> getFollowers(Long userId);
 
 }

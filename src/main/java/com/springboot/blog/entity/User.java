@@ -42,8 +42,8 @@ public class User {
             joinColumns = @JoinColumn(name = "follower_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "following_id", referencedColumnName = "id")
     )
-    private List<User> followings;
+    private Set<User> followings;
 
     @ManyToMany(mappedBy = "followings")
-    private List<User> followers;
+    private Set<User> followers;
 }

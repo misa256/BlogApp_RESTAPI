@@ -1,13 +1,17 @@
 package com.springboot.blog.service.impl;
 
 import com.springboot.blog.entity.User;
+import com.springboot.blog.exception.BlogAPIException;
+import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.repository.UserRepository;
 import com.springboot.blog.service.FollowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class FollowServiceImpl implements FollowService {
@@ -17,20 +21,24 @@ public class FollowServiceImpl implements FollowService {
 
     //フォローする
     @Override
-    public String followUser(Long followingId, Long followerId) {
-        User follower = userRepository.findById(followerId).orElseThrow(() -> new RuntimeException("Follower not found"));
-        User following = userRepository.findById(followingId).orElseThrow(() -> new RuntimeException("Following user not found"));
-        follower.getFollowings().add(following);
-        userRepository.save(follower);
-        String message = following.getUsername()+"さんをフォローしました。";
-        return  message;
+    public String follow(Long followingId, Long followerId) {
+        User follower = userRepository.findById(followerId).orElseThrow(() -> new ResourceNotFoundException("User","id", followerId));
+        User following = userRepository.findById(followingId).orElseThrow(() -> new ResourceNotFoundException("User","id", followingId));
+        if(follower.getFollowings().contains(following)){
+            throw new BlogAPIException(HttpStatus.BAD_REQUEST,following.getUsername()+"さんをすでにフォローしています");
+        }else {
+            follower.getFollowings().add(following);
+            userRepository.save(follower);
+            String message = following.getUsername() + "さんをフォローしました";
+            return message;
+        }
     }
 
     //フォローしている人のユーザーネームを一覧表示
     @Override
     public List<String> showFollowing(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        List<User> followings = userRepository.getFollowings(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User","id", userId));
+        Set<User> followings = user.getFollowings();
         List<String> followingUsernames = new ArrayList<>();
         followings.stream()
                 .forEach(following ->
@@ -42,13 +50,26 @@ public class FollowServiceImpl implements FollowService {
     //フォロワーのユーザーネームを一覧表示
     @Override
     public List<String> showFollower(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        List<User> followers = userRepository.getFollowers(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User","id", userId));
+        Set<User> followers = user.getFollowers();
         List<String> followerUsernames = new ArrayList<>();
         followers.stream()
                 .forEach(follower ->
                         followerUsernames.add(follower.getUsername())
                         );
         return followerUsernames;
+    }
+
+    @Override
+    public String unfollow(Long followingId, Long followerId) {
+        User follower = userRepository.findById(followerId).orElseThrow(() -> new ResourceNotFoundException("User","id", followerId));
+        User following = userRepository.findById(followingId).orElseThrow(() -> new ResourceNotFoundException("User","id", followingId));
+        if(!(follower.getFollowings().contains(following))){
+            throw new BlogAPIException(HttpStatus.BAD_REQUEST,following.getUsername()+"さんをフォローしていません");
+        }else{
+            follower.getFollowings().remove(following);
+            userRepository.save(follower);
+            return following.getUsername()+"のフォローを解除しました";
+        }
     }
 }
